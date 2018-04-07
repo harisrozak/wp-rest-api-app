@@ -3,7 +3,7 @@
 Class WPRestAPI_App {
 	function __construct() {
 		$this->site = 'http://localhost/kajianmu/';
-		$this->timeout_years = time() + 60 * 60 * 24 * 1080; // 3 years
+		$this->timeout_time = time() + 60 * 60 * 24 * 30; // 30 days
 	}
 
 	// Get cut position based on fixed position without break last word
@@ -48,7 +48,7 @@ Class WPRestAPI_App {
 		// 2. with get argument or not
 		if(count($get_args) > 0) {
 			$args = http_build_query($get_args);
-			$url .= '?' . $args;
+			$url.= '?' . $args;
 		}
 
 		// 3. set the options, including the url
@@ -64,30 +64,30 @@ Class WPRestAPI_App {
 		// 5. execute and fetch the resulting HTML output
 		$response = curl_exec($ch);
 		$info = curl_getinfo($ch);
-		 
+
 		// 6. free up the curl handle
 		curl_close($ch);
 
 		// 7. check file json
 		if(! $this->is_json( $response ) ) {
-			return false;
+			$this->notice_invalid_json_then_exit();
 		}
 
 		// 8. check curl code
 		if($info['http_code'] >= 400) {
-			return false;
+			$this->notice_400_then_exit($response);
 		}
 
 		return json_decode( $response );
 	}
 
 	// curl get json
-	protected function curl_post($url, $data, $need_auth = false) {
+	protected function curl_post($url, $data = array(), $check_http_code = true) {
 		$response = false;
 
 		// 1. initialize
-		$ch = curl_init();		 
-		
+		$ch = curl_init();	
+
 		// 2. set post data
 		$post_data = http_build_query($data);
 
@@ -98,20 +98,67 @@ Class WPRestAPI_App {
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
 
-		// 4. need auth or not
-		if($need_auth) {
-			$this->curl_header_auth($ch);
-		}
+		// 4. posting data require an auth
+		$this->curl_header_auth($ch);
 		 
 		// 5. execute and fetch the resulting HTML output
 		$response = curl_exec($ch);
+		$info = curl_getinfo($ch);
 		 
 		// 6. free up the curl handle
 		curl_close($ch);
 
 		// 7. check file json
 		if(! $this->is_json( $response ) ) {
-			return false;
+			$this->notice_invalid_json_then_exit();
+		}
+
+		// 8. check curl code
+		if($info['http_code'] >= 400 && $check_http_code) {
+			$this->notice_400_then_exit($response);
+		}
+
+		return json_decode( $response );
+	}
+
+	// curl delete
+	protected function curl_delete($url, $permanent = false) {
+		$response = false;
+
+		// 1. initialize
+		$ch = curl_init();	
+
+		// 2. set post data
+		$post_data = http_build_query(array(
+			'force' => $permanent,
+		));
+
+		// 3. set the options, including the url
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE"); 
+
+		// 4. posting data require an auth
+		$this->curl_header_auth($ch);
+		 
+		// 5. execute and fetch the resulting HTML output
+		$response = curl_exec($ch);
+		$info = curl_getinfo($ch);
+		 
+		// 6. free up the curl handle
+		curl_close($ch);
+
+		// 7. check file json
+		if(! $this->is_json( $response ) ) {
+			$this->notice_invalid_json_then_exit();
+		}
+
+		// 8. check curl code
+		if($info['http_code'] >= 400) {
+			$this->notice_400_then_exit($response);
 		}
 
 		return json_decode( $response );
@@ -144,7 +191,7 @@ Class WPRestAPI_App {
 
 	// set_token
 	protected function set_token($token) {
-		setcookie('wp_rest_api_app_token', $token, $this->timeout_years, "/");
+		setcookie('wp_rest_api_app_token', $token, $this->timeout_time, "/");
 	}
 
 	// remove_token
@@ -153,6 +200,18 @@ Class WPRestAPI_App {
 		
 		unset($_COOKIE['wp_rest_api_app_token']);
 		setcookie('wp_rest_api_app_token', null, -1, '/');	
+	}
+
+	// validate token
+	public function validate_token() {
+		$auth = $this->curl_post($this->site . 'wp-json/jwt-auth/v1/token/validate', array(), false);
+
+		if(isset($auth->code) && $auth->code == 'jwt_auth_valid_token') {
+			echo '<div class="alert alert-primary" role="alert">Your token is valid, you are good to go!</div>';
+		}
+		else {
+			echo $this->notice_login();
+		}
 	}
 
 	// empty data notice
@@ -165,6 +224,24 @@ Class WPRestAPI_App {
 		$string = '<div class="alert alert-danger" role="alert">Your token has expired, please ';
 		$string.= '<a href="login.php">login with your account</a> to get your access</div>';
 		return $string;
+	}
+
+	// http 400 notice
+	public function notice_400_then_exit($response) {
+		if(is_string($response)) {
+			$response = json_decode($response);
+		}
+
+		echo '<div class="alert alert-danger" role="alert">' . $response->message . '</div>';
+		require_once('footer.php');
+		exit();
+	}
+
+	// http invalid json notice
+	public function notice_invalid_json_then_exit() {
+		echo '<div class="alert alert-danger" role="alert">Invalid json response!</div>';
+		require_once('footer.php');
+		exit();
 	}
 
 	// login page action

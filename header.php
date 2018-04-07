@@ -20,7 +20,7 @@
 
     <nav class="navbar navbar-expand-md navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">Sample WP Rest API V2</a>
+            <a class="navbar-brand" href="index.php">Sample WP Rest API V2</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
@@ -32,6 +32,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="add-post.php">Add Post</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php">Validate Token</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="revoke-token.php">Revoke Token</a>

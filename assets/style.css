@@ -5,3 +5,7 @@ main.container {
 div.card {
 	margin-bottom: 20px;
 }
+
+a.btn {
+	margin-top: 5px;
+}
