@@ -1,4 +1,8 @@
-main.container {
+body > main {
+	margin-bottom: 50px;
+}
+
+body > main.container {
 	margin-top: 25px;
 }
 
