@@ -22,7 +22,6 @@ Add below lines to `.htaccess` line inside tag `<IfModule>`
 RewriteCond %{HTTP:Authorization} ^(.*)
 RewriteRule ^(.*) - [E=HTTP_AUTHORIZATION:%1]
 SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
-
 ```
 
 ### JWT Authentication secret key
@@ -32,5 +31,4 @@ Add below lines to `wp-config.php`
 ```
 /** JWT_AUTH */
 define('JWT_AUTH_SECRET_KEY', 'replace me with wordpress's salt string');
-
 ```
