@@ -1,6 +1,6 @@
 # WordPress Rest API APP
 
-Sample WordPress Rest API application with PHP
+A Standalone Sample WordPress Rest API application with PHP
 
 More about WordPress Rest API, visit: https://developer.wordpress.org/rest-api/
 
@@ -53,3 +53,7 @@ function __construct() {
 	$this->timeout_time = time() + 60 * 60 * 24 * 30; // 30 days
 }
 ```
+
+## Screenshots
+
+![Screenshot](screenshot.png "Screenshot")
