@@ -2,7 +2,7 @@
 
 Class WPRestAPI_App {
 	function __construct() {
-		$this->site = 'http://localhost/kajianmu/';
+		$this->site = 'http://demo.astahub.com/kajianmu/';
 		$this->timeout_time = time() + 60 * 60 * 24 * 30; // 30 days
 	}
 
@@ -82,7 +82,7 @@ Class WPRestAPI_App {
 	}
 
 	// curl get json
-	protected function curl_post($url, $data = array(), $check_http_code = true) {
+	protected function curl_post($url, $data = array(), $check_http_code = true, $need_auth = true) {
 		$response = false;
 
 		// 1. initialize
@@ -99,7 +99,9 @@ Class WPRestAPI_App {
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
 
 		// 4. posting data require an auth
-		$this->curl_header_auth($ch);
+		if($need_auth) {
+			$this->curl_header_auth($ch);
+		}
 		 
 		// 5. execute and fetch the resulting HTML output
 		$response = curl_exec($ch);
@@ -252,7 +254,9 @@ Class WPRestAPI_App {
 				array (
 					'username' => $_POST['username'],
 					'password' => $_POST['password'],
-				)
+				),
+				false,
+				false
 			);
 
 			// success or not
