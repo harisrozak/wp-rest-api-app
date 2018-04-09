@@ -54,6 +54,6 @@ function __construct() {
 }
 ```
 
-## Screenshots
+## Screenshot
 
 ![Screenshot](screenshot.png "Screenshot")
