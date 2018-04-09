@@ -67,14 +67,14 @@ Class WPRestAPI_Post extends WPRestAPI_App {
 				'title' => $_POST['title'],
 				'status' => $_POST['status'],
 				'content' => $_POST['content'],
+				'fields[name]' => isset($_POST['name']) ? $_POST['name'] : '',
+				'fields[address]' => isset($_POST['address']) ? $_POST['address'] : '',
+				'fields[gender]' => isset($_POST['gender']) ? $_POST['gender'] : '',
 			)
 		);
 
 		// success or not
 		if(isset($response->id)) {
-			// curl acf fields
-			$this->add_acf_fields($response->id);
-
 			// noticea
 			$string = '<div class="alert alert-primary" role="alert">Your post has been saved!. ';
 			$string.= 'Now you can <a href="edit-post.php?id=' . $response->id . '">edit your post</a> ';
@@ -89,18 +89,6 @@ Class WPRestAPI_Post extends WPRestAPI_App {
 		}
 	}
 
-	private function add_acf_fields($post_id) {
-		// do curl
-		$response = $this->curl_post(
-			$this->site . 'wp-json/acf/v3/posts/' . intval($post_id),
-			array(
-				'fields[name]' => isset($_POST['name']) ? $_POST['name'] : '',
-				'fields[address]' => isset($_POST['address']) ? $_POST['address'] : '',
-				'fields[gender]' => isset($_POST['gender']) ? $_POST['gender'] : '',
-			)
-		);
-	}
-
 	public function get_post($post_id = 0) {
 		// invalid id notice
 		if(intval($post_id) <= 0) {
@@ -110,27 +98,6 @@ Class WPRestAPI_Post extends WPRestAPI_App {
 		$post = $this->curl_get(
 			$this->site . 'wp-json/wp/v2/posts/' . intval($post_id),
 			array('status' => 'any'),
-			true
-		);
-
-		// notices
-		if(empty($post)) {
-			echo $this->notice_empty();
-		}
-
-		// data
-		return $post;
-	}
-
-	public function get_acf_fields($post_id = 0) {
-		// invalid id notice
-		if(intval($post_id) <= 0) {
-			echo $this->notice_empty();
-		}
-
-		$post = $this->curl_get(
-			$this->site . 'wp-json/acf/v3/posts/' . intval($post_id),
-			array(),
 			true
 		);
 

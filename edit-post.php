@@ -6,12 +6,11 @@ $post_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $posts = new WPRestAPI_Post();
 $posts->add_post();
 $post = $posts->get_post($post_id);
-$fields = $posts->get_acf_fields($post_id);
 
 // fields
-$field_name = isset($fields->acf->name) ? $fields->acf->name : '';
-$field_address = isset($fields->acf->address) ? $fields->acf->address : '';
-$field_gender = isset($fields->acf->gender) ? $fields->acf->gender : '';
+$field_name = isset($post->acf->name) ? $post->acf->name : '';
+$field_address = isset($post->acf->address) ? $post->acf->address : '';
+$field_gender = isset($post->acf->gender) ? $post->acf->gender : '';
 
 ?>
 
