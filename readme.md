@@ -18,12 +18,16 @@ More about WordPress Rest API, visit: https://developer.wordpress.org/rest-api/
 
 ### Enable auth header
 
-Add below lines to file `.htaccess` inside tag `<IfModule>`
+Add below lines to the bottom of the `.htaccess` file
 
 ```
+# BEGIN WordPress JWT Auth
+<IfModule mod_rewrite.c>
 RewriteCond %{HTTP:Authorization} ^(.*)
 RewriteRule ^(.*) - [E=HTTP_AUTHORIZATION:%1]
 SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+</IfModule>
+# END WordPress JWT Auth
 ```
 
 ### JWT Authentication secret key
